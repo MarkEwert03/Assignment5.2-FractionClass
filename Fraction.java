@@ -184,4 +184,52 @@ class Fraction{
         f.reduce();
         return f;
     }
+
+    public static Fraction approximate(double d, int repeat){
+        //turns double into Strings
+        String str = String.valueOf(d);
+
+        //finds decimal points in each numberical String
+        int dec = str.indexOf(".");
+
+        //splices str into two chunks (integer in front and digits after decimal point)
+        String frontStr = str.substring(0, dec);
+        String backStr = "0" + str.substring(dec);
+
+        //turns Strings back into ints
+        int front = Integer.parseInt(frontStr);
+        double back = Double.parseDouble(backStr);
+
+        //initializing the bounds
+        Fraction low = new Fraction(0, 1);
+        Fraction high = new Fraction(1, 1);
+        
+        //Farey algorithm
+        Fraction closest = new Fraction();
+        for (int i = 0; i < repeat; i++){
+            Fraction middle = new Fraction(low.num + high.num, low.den + high.den);
+            //System.out.println(middle + " at cycle #" + i);
+            //if you want to watch the algorithm work
+            
+            double mid = middle.toDouble();
+            if (back == mid) {
+                //found the exact fraction
+                closest = middle;
+                break;
+            }else if (back < mid) {
+                //bring upper bound lower
+                high = middle;
+            } else if (back > mid) {
+                //bring lower bound higher
+                low = middle;
+            }
+            closest = middle;
+        }
+        
+        //turn mixed fraction into improper fraction
+        Fraction ans = Fraction.add(new Fraction(front, 1), closest);
+        ans.reduce();
+        
+        return ans;
+    }
 }
